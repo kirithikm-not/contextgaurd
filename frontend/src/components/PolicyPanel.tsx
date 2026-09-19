@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { EnginePolicy } from '@/types/contextguard';
-import { Settings, Save, RotateCcw, Shield, CheckCircle2, AlertCircle, Sliders } from 'lucide-react';
+import { EnginePolicyConfig } from '@/types/contextguard';
+import { Settings, Save, RotateCcw, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 
 interface PolicyPanelProps {
-  onPolicyUpdated?: () => void;
+  onPolicyUpdated: () => void;
 }
 
 export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => {
-  const [policy, setPolicy] = useState<EnginePolicy | null>(null);
+  const [policy, setPolicy] = useState<EnginePolicyConfig | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
         setPolicy(data);
       }
     } catch (e) {
-      console.error('Failed to fetch policy:', e);
+      console.error('Failed to load policy:', e);
     } finally {
       setLoading(false);
     }
@@ -34,18 +34,18 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
     fetchPolicy();
   }, []);
 
-  const handleWeightChange = (key: keyof EnginePolicy['weights'], val: number) => {
+  const handleWeightChange = (category: keyof EnginePolicyConfig['weights'], val: number) => {
     if (!policy) return;
     setPolicy({
       ...policy,
       weights: {
         ...policy.weights,
-        [key]: val,
+        [category]: val,
       },
     });
   };
 
-  const handleThresholdChange = (key: keyof EnginePolicy['thresholds'], val: number) => {
+  const handleThresholdChange = (key: keyof EnginePolicyConfig['thresholds'], val: number) => {
     if (!policy) return;
     setPolicy({
       ...policy,
@@ -56,74 +56,69 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
     });
   };
 
-  const totalWeight = policy
-    ? Object.values(policy.weights).reduce((acc, w) => acc + w, 0)
-    : 1.0;
-
   const handleSavePolicy = async () => {
     if (!policy) return;
     setSaving(true);
     setSaveMessage(null);
     try {
       const res = await fetch(`${API_BASE_URL}/api/policy`, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(policy),
       });
+
       if (res.ok) {
-        setSaveMessage('Policy weights and thresholds successfully saved to Zero-Trust Engine!');
-        if (onPolicyUpdated) onPolicyUpdated();
+        setSaveMessage('Policy updated successfully! Active in memory & SQLite persistence.');
+        onPolicyUpdated();
       } else {
         const err = await res.json();
-        setSaveMessage(`Error saving policy: ${err.detail || 'Invalid weight configuration'}`);
+        setSaveMessage(`Error: ${err.detail || 'Failed to update policy'}`);
       }
-    } catch (e: any) {
-      setSaveMessage(`Network error: ${e.message}`);
+    } catch (e) {
+      setSaveMessage('Network error applying policy updates.');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleResetDefaults = () => {
-    if (!policy) return;
-    setPolicy({
-      policy_id: 'default_zero_trust_v1',
-      name: 'Standard Enterprise Zero-Trust Policy',
-      weights: {
-        identity: 0.15,
-        device: 0.20,
-        location: 0.20,
-        behavior: 0.15,
-        resource: 0.15,
-        history: 0.10,
-        threat: 0.05,
-      },
-      thresholds: {
-        allow_max: 29.0,
-        challenge_max: 54.0,
-        restrict_max: 79.0,
-        ambiguous_boundary_delta: 5.0,
-      },
-    });
+  const handleResetDefaults = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/policy/reset`, { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        setPolicy(data.policy);
+        setSaveMessage('Reset to canonical default weights and thresholds.');
+        onPolicyUpdated();
+      }
+    } catch (e) {
+      setSaveMessage('Failed to reset defaults.');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const totalWeight = policy
+    ? Object.values(policy.weights).reduce((a, b) => a + b, 0)
+    : 1.0;
 
   if (loading || !policy) {
     return (
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-8 text-center text-slate-500 font-mono text-xs">
+      <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500 font-mono text-xs shadow-sm">
         Loading engine policy configuration...
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-6 shadow-2xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-6 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <Settings className="w-5 h-5 text-cyan-400" />
-            Zero-Trust Policy & Weights Calibration
+          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <Settings className="w-5 h-5 text-indigo-600" />
+            Zero-Trust Policy &amp; Weights Calibration
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Prove to judges that scoring weights and threshold boundaries are tunable policies rather than hardcoded heuristics.
           </p>
         </div>
@@ -131,7 +126,7 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
         <div className="flex items-center gap-3">
           <button
             onClick={handleResetDefaults}
-            className="px-3.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-300 transition-all flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-mono text-slate-700 transition-all flex items-center gap-1.5 shadow-xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Reset Defaults
@@ -139,7 +134,7 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
           <button
             onClick={handleSavePolicy}
             disabled={saving}
-            className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs font-mono flex items-center gap-2 shadow-lg shadow-cyan-600/30 transition-all disabled:opacity-50"
+            className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-600 hover:to-sky-600 text-white font-bold text-xs font-mono flex items-center gap-2 shadow-sm shadow-indigo-200 transition-all disabled:opacity-50"
           >
             <Save className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             Apply Policy to Live Engine
@@ -148,12 +143,12 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
       </div>
 
       {saveMessage && (
-        <div className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2 ${
+        <div className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2 shadow-xs ${
           saveMessage.includes('Error') 
-            ? 'bg-rose-500/15 border-rose-500/30 text-rose-300' 
-            : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+            ? 'bg-rose-50 border-rose-200 text-rose-800' 
+            : 'bg-emerald-50 border-emerald-200 text-emerald-800'
         }`}>
-          {saveMessage.includes('Error') ? <AlertCircle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
+          {saveMessage.includes('Error') ? <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" /> : <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />}
           <span>{saveMessage}</span>
         </div>
       )}
@@ -161,12 +156,12 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Category Weights Panel */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h4 className="text-xs font-mono uppercase font-bold text-slate-300">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h4 className="text-xs font-mono uppercase font-bold text-slate-700">
               Category Scoring Weights (Must sum to 1.0)
             </h4>
             <span className={`text-xs font-mono font-bold ${
-              Math.abs(totalWeight - 1.0) < 0.02 ? 'text-emerald-400' : 'text-rose-400'
+              Math.abs(totalWeight - 1.0) < 0.02 ? 'text-emerald-700' : 'text-rose-700'
             }`}>
               Sum: {totalWeight.toFixed(2)}
             </span>
@@ -176,8 +171,8 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
             {Object.entries(policy.weights).map(([cat, weight]) => (
               <div key={cat} className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
-                  <span className="text-slate-300 capitalize">{cat}</span>
-                  <span className="text-cyan-400 font-bold">{(weight as number * 100).toFixed(0)}% ({(weight as number).toFixed(2)})</span>
+                  <span className="text-slate-700 capitalize">{cat}</span>
+                  <span className="text-indigo-700 font-bold">{(weight as number * 100).toFixed(0)}% ({(weight as number).toFixed(2)})</span>
                 </div>
                 <input
                   type="range"
@@ -186,7 +181,7 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
                   step="0.05"
                   value={weight as number}
                   onChange={(e) => handleWeightChange(cat as any, parseFloat(e.target.value))}
-                  className="w-full accent-cyan-500 cursor-pointer"
+                  className="w-full accent-indigo-500 cursor-pointer"
                 />
               </div>
             ))}
@@ -195,18 +190,18 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
 
         {/* Decision Thresholds Panel */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h4 className="text-xs font-mono uppercase font-bold text-slate-300">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h4 className="text-xs font-mono uppercase font-bold text-slate-700">
               Decision Boundary Thresholds (0–100)
             </h4>
-            <span className="text-xs font-mono text-cyan-400 font-bold">4 Tiers</span>
+            <span className="text-xs font-mono text-indigo-700 font-bold">4 Tiers</span>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-emerald-400 font-bold">Allow Ceiling (0 to Max)</span>
-                <span className="text-white font-bold">{policy.thresholds.allow_max} pts</span>
+                <span className="text-emerald-700 font-bold">Allow Ceiling (0 to Max)</span>
+                <span className="text-slate-900 font-bold">{policy.thresholds.allow_max} pts</span>
               </div>
               <input
                 type="range"
@@ -215,14 +210,14 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
                 step="1"
                 value={policy.thresholds.allow_max}
                 onChange={(e) => handleThresholdChange('allow_max', parseFloat(e.target.value))}
-                className="w-full accent-emerald-500 cursor-pointer"
+                className="w-full accent-emerald-600 cursor-pointer"
               />
             </div>
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-amber-400 font-bold">Challenge Ceiling</span>
-                <span className="text-white font-bold">{policy.thresholds.challenge_max} pts</span>
+                <span className="text-amber-800 font-bold">Challenge Ceiling</span>
+                <span className="text-slate-900 font-bold">{policy.thresholds.challenge_max} pts</span>
               </div>
               <input
                 type="range"
@@ -231,14 +226,14 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
                 step="1"
                 value={policy.thresholds.challenge_max}
                 onChange={(e) => handleThresholdChange('challenge_max', parseFloat(e.target.value))}
-                className="w-full accent-amber-500 cursor-pointer"
+                className="w-full accent-amber-600 cursor-pointer"
               />
             </div>
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-orange-400 font-bold">Restrict Ceiling (➔ Deny Above)</span>
-                <span className="text-white font-bold">{policy.thresholds.restrict_max} pts</span>
+                <span className="text-orange-800 font-bold">Restrict Ceiling (➔ Deny Above)</span>
+                <span className="text-slate-900 font-bold">{policy.thresholds.restrict_max} pts</span>
               </div>
               <input
                 type="range"
@@ -247,14 +242,14 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
                 step="1"
                 value={policy.thresholds.restrict_max}
                 onChange={(e) => handleThresholdChange('restrict_max', parseFloat(e.target.value))}
-                className="w-full accent-orange-500 cursor-pointer"
+                className="w-full accent-orange-600 cursor-pointer"
               />
             </div>
 
-            <div className="space-y-1 pt-2 border-t border-slate-800">
+            <div className="space-y-1 pt-2 border-t border-slate-100">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-cyan-400 font-bold">Ambiguous Boundary Zone Margin (± Delta)</span>
-                <span className="text-white font-bold">±{policy.thresholds.ambiguous_boundary_delta} pts</span>
+                <span className="text-indigo-700 font-bold">Ambiguous Boundary Zone Margin (± Delta)</span>
+                <span className="text-slate-900 font-bold">±{policy.thresholds.ambiguous_boundary_delta} pts</span>
               </div>
               <input
                 type="range"
@@ -263,7 +258,7 @@ export const PolicyPanel: React.FC<PolicyPanelProps> = ({ onPolicyUpdated }) => 
                 step="0.5"
                 value={policy.thresholds.ambiguous_boundary_delta}
                 onChange={(e) => handleThresholdChange('ambiguous_boundary_delta', parseFloat(e.target.value))}
-                className="w-full accent-cyan-500 cursor-pointer"
+                className="w-full accent-indigo-500 cursor-pointer"
               />
               <span className="text-[10px] text-slate-500 font-mono">
                 Scores landing within ±{policy.thresholds.ambiguous_boundary_delta} of threshold boundaries trigger AI SOC Analyst review.

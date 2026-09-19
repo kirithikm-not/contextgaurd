@@ -138,25 +138,26 @@ export default function DashboardPage() {
           if (data.history && data.history.length > 0) {
             setLoginHistoryList(data.history);
             setLatestLogin(data.history[0]);
-            // Default location signals from real history if not already set
-            setLocationSignals((prev) => prev || {
-              country: data.history[0].geo_country || 'Local Network',
-              city: data.history[0].geo_city || 'Localhost',
-              is_known_location: true,
-              impossible_travel_flag: false,
-              vpn_tor_detected: data.history[0].is_vpn_or_proxy,
-            });
+            if (!locationSignals) {
+              setLocationSignals({
+                country: data.history[0].geo_country,
+                city: data.history[0].geo_city,
+                is_known_location: true,
+                impossible_travel_flag: false,
+                vpn_tor_detected: data.history[0].is_vpn_or_proxy,
+              });
+            }
           }
         }
-      } catch (err) {
-        console.error('Error fetching login history:', err);
+      } catch (e) {
+        console.error('Failed to fetch user login history:', e);
       }
     };
 
     fetchHistory();
-  }, [router]);
+  }, []);
 
-  // Trigger Real Live Contextual Access Evaluation
+  // Trigger Live Access Request with Optional Simulated Context
   const handleTriggerEvaluation = async () => {
     if (!user) return;
     setLoading(true);
@@ -254,36 +255,36 @@ export default function DashboardPage() {
   const getDecisionColor = (decision: string) => {
     switch (decision?.toLowerCase()) {
       case 'allow':
-        return 'text-emerald-400 bg-emerald-950/70 border-emerald-800/80';
+        return 'text-emerald-800 bg-emerald-50 border-emerald-300 font-bold';
       case 'challenge':
-        return 'text-amber-400 bg-amber-950/70 border-amber-800/80';
+        return 'text-amber-900 bg-amber-50 border-amber-300 font-bold';
       case 'restrict':
-        return 'text-orange-400 bg-orange-950/70 border-orange-800/80';
+        return 'text-orange-900 bg-orange-50 border-orange-300 font-bold';
       case 'deny':
-        return 'text-rose-400 bg-rose-950/70 border-rose-800/80';
+        return 'text-rose-900 bg-rose-50 border-rose-300 font-bold';
       default:
-        return 'text-slate-400 bg-slate-900 border-slate-800';
+        return 'text-slate-700 bg-slate-100 border-slate-300 font-bold';
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
       {/* Dashboard Sub-Header */}
-      <div className="border-b border-slate-800/80 bg-slate-900/40 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div className="border-b border-slate-200/80 bg-white/80 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-3">
-          <Link href="/" className="p-2 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:opacity-90 transition-opacity">
+          <Link href="/" className="p-2 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-400 text-white shadow-sm shadow-indigo-200 hover:opacity-90 transition-opacity">
             <Shield className="w-5 h-5" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-base font-bold tracking-tight text-slate-100">
+              <h1 className="text-base font-bold tracking-tight text-slate-900">
                 ContextGuard Live Portal
               </h1>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60 flex items-center gap-1">
-                <Radio className="w-2.5 h-2.5 animate-pulse text-cyan-400" /> Live Mode
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1 font-bold">
+                <Radio className="w-2.5 h-2.5 animate-pulse text-indigo-600" /> Live Mode
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Continuous Adaptive Zero-Trust Verification</p>
+            <p className="text-[11px] text-slate-500">Continuous Adaptive Zero-Trust Verification</p>
           </div>
         </div>
 
@@ -291,16 +292,16 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="text-xs font-mono text-slate-400 hover:text-cyan-300 border border-slate-800 hover:border-cyan-800 bg-slate-900/80 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all"
+            className="text-xs font-mono text-slate-600 hover:text-indigo-600 border border-slate-200 hover:border-indigo-200 bg-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-xs"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Scenario Demo Mode
           </Link>
 
           {user && (
-            <div className="flex items-center gap-2 border border-slate-800 bg-slate-900/80 px-3 py-1.5 rounded-xl">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-xs font-mono text-slate-200">{user.email}</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+            <div className="flex items-center gap-2 border border-slate-200 bg-white px-3 py-1.5 rounded-xl shadow-xs">
+              <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="text-xs font-mono text-slate-700">{user.email}</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">
                 MFA Active
               </span>
             </div>
@@ -308,10 +309,10 @@ export default function DashboardPage() {
 
           <Link
             href="/mfa-setup"
-            className="text-xs font-mono text-slate-400 hover:text-amber-300 border border-slate-800 bg-slate-900/80 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all"
+            className="text-xs font-mono text-slate-600 hover:text-amber-800 border border-slate-200 bg-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-xs"
             title="Manage or re-scan Authenticator"
           >
-            <KeyRound className="w-3.5 h-3.5 text-amber-400" /> Re-enroll MFA
+            <KeyRound className="w-3.5 h-3.5 text-amber-600" /> Re-enroll MFA
           </Link>
         </div>
       </div>
@@ -321,27 +322,27 @@ export default function DashboardPage() {
         
         {/* PHASE 4 HIGHLIGHT: CRITICAL IMPOSSIBLE TRAVEL WARNING BANNER */}
         {locationSignals?.impossible_travel_flag && (
-          <div className="bg-rose-950/60 border-2 border-rose-600/80 rounded-2xl p-5 shadow-2xl shadow-rose-950/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-3 duration-300">
+          <div className="bg-rose-50 border-2 border-rose-300 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-3 duration-300">
             <div className="flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-rose-900/60 border border-rose-500/60 text-rose-400 shrink-0 mt-0.5 animate-pulse">
+              <div className="p-2.5 rounded-xl bg-rose-100 border border-rose-200 text-rose-600 shrink-0 mt-0.5 animate-pulse">
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-400 bg-rose-950 px-2 py-0.5 rounded border border-rose-800">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-800 bg-rose-100 px-2 py-0.5 rounded border border-rose-200">
                     CRITICAL SECURITY ANOMALY
                   </span>
-                  <span className="text-xs font-mono text-rose-300 font-semibold">
+                  <span className="text-xs font-mono text-rose-900 font-bold">
                     Impossible Travel Velocity Detected
                   </span>
                 </div>
-                <p className="text-xs text-rose-200/90 mt-1.5 leading-relaxed max-w-3xl">
+                <p className="text-xs text-rose-800 mt-1.5 leading-relaxed max-w-3xl">
                   Calculated relocation velocity exceeded the <strong>900 km/h physical human travel threshold</strong> between consecutive sessions ({locationSignals.city}, {locationSignals.country}). High probability of stolen session credentials or distributed proxy routing. Immediate Step-Up MFA Challenge enforced.
                 </p>
               </div>
             </div>
 
-            <span className="text-[11px] font-mono font-bold text-rose-300 bg-rose-900/80 border border-rose-700 px-3 py-1.5 rounded-xl whitespace-nowrap self-end md:self-center">
+            <span className="text-[11px] font-mono font-bold text-rose-800 bg-rose-100 border border-rose-300 px-3 py-1.5 rounded-xl whitespace-nowrap self-end md:self-center shadow-xs">
               Speed: &gt;900 km/h [FLAGGED]
             </span>
           </div>
@@ -350,39 +351,39 @@ export default function DashboardPage() {
         {/* PHASE 4: LIVE LOCATION & NETWORK SIGNALS CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Detected City & Country */}
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 space-y-2">
-            <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+            <div className="flex justify-between items-center text-xs font-mono text-slate-500">
               <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-cyan-400" /> Detected Geolocation
+                <MapPin className="w-3.5 h-3.5 text-indigo-600" /> Detected Geolocation
               </span>
-              <span className="text-[10px] text-slate-500">Live IP-API</span>
+              <span className="text-[10px] text-slate-400">Live IP-API</span>
             </div>
-            <div className="text-lg font-bold text-slate-100">
+            <div className="text-lg font-bold text-slate-900">
               {locationSignals ? `${locationSignals.city}, ${locationSignals.country}` : 'Localhost, Local Network'}
             </div>
-            <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+            <div className="text-[11px] font-mono text-slate-500 flex items-center gap-1.5">
               <span>IP:</span>
-              <span className="text-cyan-300 select-all font-bold">
+              <span className="text-indigo-700 select-all font-bold">
                 {latestLogin?.ip_address || '127.0.0.1'}
               </span>
             </div>
           </div>
 
           {/* VPN / Proxy Detection Signal */}
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 space-y-2">
-            <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+            <div className="flex justify-between items-center text-xs font-mono text-slate-500">
               <span className="flex items-center gap-1.5">
-                <Wifi className="w-3.5 h-3.5 text-blue-400" /> Network Posture
+                <Wifi className="w-3.5 h-3.5 text-sky-600" /> Network Posture
               </span>
-              <span className="text-[10px] text-slate-500">Telemetry</span>
+              <span className="text-[10px] text-slate-400">Telemetry</span>
             </div>
             <div className="text-base font-bold">
               {locationSignals?.vpn_tor_detected ? (
-                <span className="text-rose-400 flex items-center gap-1.5">
+                <span className="text-rose-700 flex items-center gap-1.5">
                   <AlertCircle className="w-4 h-4" /> VPN / Proxy Active
                 </span>
               ) : (
-                <span className="text-emerald-400 flex items-center gap-1.5">
+                <span className="text-emerald-700 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" /> Direct Connection
                 </span>
               )}
@@ -395,20 +396,20 @@ export default function DashboardPage() {
           </div>
 
           {/* Known Location Baseline */}
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 space-y-2">
-            <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+            <div className="flex justify-between items-center text-xs font-mono text-slate-500">
               <span className="flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-indigo-400" /> Baseline Location
+                <Globe className="w-3.5 h-3.5 text-indigo-600" /> Baseline Location
               </span>
-              <span className="text-[10px] text-slate-500">History</span>
+              <span className="text-[10px] text-slate-400">History</span>
             </div>
             <div className="text-base font-bold">
               {locationSignals?.is_known_location ? (
-                <span className="text-emerald-400 flex items-center gap-1.5">
+                <span className="text-emerald-700 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" /> Verified Baseline
                 </span>
               ) : (
-                <span className="text-amber-400 flex items-center gap-1.5">
+                <span className="text-amber-800 flex items-center gap-1.5">
                   <AlertCircle className="w-4 h-4" /> New Region
                 </span>
               )}
@@ -421,20 +422,20 @@ export default function DashboardPage() {
           </div>
 
           {/* Travel Velocity / Status */}
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 space-y-2">
-            <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs">
+            <div className="flex justify-between items-center text-xs font-mono text-slate-500">
               <span className="flex items-center gap-1.5">
-                <Gauge className="w-3.5 h-3.5 text-amber-400" /> Travel Speed
+                <Gauge className="w-3.5 h-3.5 text-amber-600" /> Travel Speed
               </span>
-              <span className="text-[10px] text-slate-500">Haversine</span>
+              <span className="text-[10px] text-slate-400">Haversine</span>
             </div>
             <div className="text-base font-bold">
               {locationSignals?.impossible_travel_flag ? (
-                <span className="text-rose-400 font-mono">
+                <span className="text-rose-700 font-mono">
                   &gt; 900 km/h (Anomaly)
                 </span>
               ) : (
-                <span className="text-emerald-400 font-mono">
+                <span className="text-emerald-700 font-mono">
                   Nominal (&lt; 900 km/h)
                 </span>
               )}
@@ -448,13 +449,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Phase 3 & 4 Evaluation Controls */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" /> Real-Time Access & Risk Evaluation
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-indigo-600" /> Real-Time Access &amp; Risk Evaluation
               </h2>
-              <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+              <p className="text-xs text-slate-500 mt-1 max-w-2xl">
                 Trigger a live access request against ContextGuard's 7-category risk engine with real IP geolocation, baseline matching, and optional step-up challenge triggers.
               </p>
             </div>
@@ -462,7 +463,7 @@ export default function DashboardPage() {
             <button
               onClick={handleTriggerEvaluation}
               disabled={loading}
-              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-mono font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-cyan-950/50 transition-all cursor-pointer whitespace-nowrap self-start md:self-auto disabled:opacity-50"
+              className="bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-600 hover:to-sky-600 text-white text-xs font-mono font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-sm shadow-indigo-200 transition-all cursor-pointer whitespace-nowrap self-start md:self-auto disabled:opacity-50"
             >
               {loading ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -473,16 +474,16 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
             {/* Target Resource Selector */}
             <div className="space-y-2">
-              <label className="text-xs font-mono font-bold text-slate-300 flex items-center gap-2">
-                <Database className="w-4 h-4 text-cyan-400" /> Target Resource
+              <label className="text-xs font-mono font-bold text-slate-700 flex items-center gap-2">
+                <Database className="w-4 h-4 text-indigo-600" /> Target Resource
               </label>
               <select
                 value={activeResource}
                 onChange={(e) => setActiveResource(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-indigo-400 shadow-xs"
               >
                 <option value="doc_confidential_q3">Q3 Confidential Financial Models (Confidential)</option>
                 <option value="production_vault">Production Secrets Vault (Restricted)</option>
@@ -493,13 +494,13 @@ export default function DashboardPage() {
 
             {/* Context Simulation Trigger */}
             <div className="space-y-2">
-              <label className="text-xs font-mono font-bold text-slate-300 flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-amber-400" /> Live Simulation Context
+              <label className="text-xs font-mono font-bold text-slate-700 flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-amber-600" /> Live Simulation Context
               </label>
               <select
                 value={simulateAnomaly}
                 onChange={(e) => setSimulateAnomaly(e.target.value as any)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-amber-400 shadow-xs"
               >
                 <option value="none">✔ Baseline Real Environment (Local/Current IP)</option>
                 <option value="step_up_challenge">⚡ Simulate BYOD &amp; Off-Hours (Triggers Challenge)</option>
@@ -511,52 +512,52 @@ export default function DashboardPage() {
 
         {/* Phase 3 Highlight: Visible Before -> After Decision Upgrade Card */}
         {verificationResult && (
-          <div className="bg-emerald-950/30 border border-emerald-800/80 rounded-2xl p-6 shadow-xl animate-in fade-in slide-in-from-top-4 duration-300">
-            <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider mb-4">
-              <CheckCircle2 className="w-4 h-4" /> Live Challenge Verification Complete — Decision Upgraded
+          <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-6 shadow-xs animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center gap-2 text-emerald-800 text-xs font-mono font-bold uppercase tracking-wider mb-4">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Live Challenge Verification Complete — Decision Upgraded
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               {/* Before vs After Visual Diff */}
-              <div className="flex items-center gap-4 bg-slate-950/90 border border-slate-800 p-5 rounded-xl">
+              <div className="flex items-center gap-4 bg-white border border-slate-200 p-5 rounded-xl shadow-xs">
                 {/* Before */}
                 <div className="flex-1 text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">Pre-Verification</span>
-                  <div className="mt-1 px-3 py-1.5 rounded-lg font-mono font-bold text-sm bg-amber-950/80 text-amber-300 border border-amber-800/60">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase">Pre-Verification</span>
+                  <div className="mt-1 px-3 py-1.5 rounded-lg font-mono font-bold text-sm bg-amber-50 text-amber-900 border border-amber-200">
                     {verificationResult.beforeDecision}
                   </div>
-                  <span className="text-xs font-mono text-slate-400 mt-1 block">
-                    Score: <span className="text-amber-400 font-bold">{verificationResult.beforeScore.toFixed(1)}</span>
+                  <span className="text-xs font-mono text-slate-500 mt-1 block">
+                    Score: <span className="text-amber-800 font-bold">{verificationResult.beforeScore.toFixed(1)}</span>
                   </span>
                 </div>
 
-                <div className="p-2 rounded-full bg-slate-800 text-slate-400">
-                  <ArrowRight className="w-5 h-5 text-emerald-400" />
+                <div className="p-2 rounded-full bg-slate-100 text-slate-500">
+                  <ArrowRight className="w-5 h-5 text-emerald-600" />
                 </div>
 
                 {/* After */}
                 <div className="flex-1 text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">Post-Verification</span>
-                  <div className="mt-1 px-3 py-1.5 rounded-lg font-mono font-bold text-sm bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 shadow-lg shadow-emerald-950/50">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase">Post-Verification</span>
+                  <div className="mt-1 px-3 py-1.5 rounded-lg font-mono font-bold text-sm bg-emerald-50 text-emerald-900 border border-emerald-200 shadow-xs">
                     {verificationResult.afterDecision}
                   </div>
-                  <span className="text-xs font-mono text-slate-400 mt-1 block">
-                    Score: <span className="text-emerald-400 font-bold">{verificationResult.afterScore.toFixed(1)}</span>
-                    <span className="text-[10px] text-emerald-400 ml-1">(-15.0 MFA Credit)</span>
+                  <span className="text-xs font-mono text-slate-500 mt-1 block">
+                    Score: <span className="text-emerald-700 font-bold">{verificationResult.afterScore.toFixed(1)}</span>
+                    <span className="text-[10px] text-emerald-700 ml-1">(-15.0 MFA Credit)</span>
                   </span>
                 </div>
               </div>
 
               {/* Rationale & Audit Confirmation */}
               <div className="space-y-2 text-xs font-mono">
-                <div className="text-slate-300 font-bold flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-cyan-400" /> Engine Decision Rationale:
+                <div className="text-slate-800 font-bold flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-indigo-600" /> Engine Decision Rationale:
                 </div>
-                <p className="text-slate-400 leading-relaxed bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
+                <p className="text-slate-700 leading-relaxed bg-white p-3 rounded-lg border border-slate-200 shadow-xs">
                   {verificationResult.rationale}
                 </p>
                 <div className="text-[11px] text-slate-500">
-                  Resolved Challenge ID: <span className="text-slate-400 select-all">{verificationResult.challengeId}</span>
+                  Resolved Challenge ID: <span className="text-slate-700 select-all font-bold">{verificationResult.challengeId}</span>
                 </div>
               </div>
             </div>
@@ -565,11 +566,11 @@ export default function DashboardPage() {
 
         {/* Current Evaluation Live Card */}
         {currentEval && !verificationResult && (
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
             <div className="flex justify-between items-start flex-wrap gap-4">
               <div>
-                <span className="text-[10px] font-mono text-slate-400">EVALUATION ID: {currentEval.evaluation_id}</span>
-                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2 mt-1">
+                <span className="text-[10px] font-mono text-slate-500">EVALUATION ID: {currentEval.evaluation_id}</span>
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-1">
                   Access Decision Result:
                   <span className={`px-3 py-1 rounded-lg text-xs font-mono font-bold border ${getDecisionColor(currentEval.decision)}`}>
                     {currentEval.decision}
@@ -578,28 +579,28 @@ export default function DashboardPage() {
               </div>
 
               <div className="text-right font-mono">
-                <span className="text-xs text-slate-400">Composite Risk Score:</span>
-                <div className="text-2xl font-bold text-cyan-300">
-                  {currentEval.final_score.toFixed(1)} <span className="text-xs text-slate-500 font-normal">/ 100</span>
+                <span className="text-xs text-slate-500">Composite Risk Score:</span>
+                <div className="text-2xl font-bold text-indigo-700">
+                  {currentEval.final_score.toFixed(1)} <span className="text-xs text-slate-400 font-normal">/ 100</span>
                 </div>
               </div>
             </div>
 
             {/* If Challenge triggered, show action banner */}
             {currentEval.mfa_required && (
-              <div className="bg-amber-950/40 border border-amber-800/80 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3 text-amber-300 text-xs font-mono">
-                  <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xs">
+                <div className="flex items-center gap-3 text-amber-900 text-xs font-mono">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
                   <div>
                     <span className="font-bold">Step-Up Verification Required:</span>
-                    <p className="text-amber-400/80 text-[11px] mt-0.5">
+                    <p className="text-amber-800 text-[11px] mt-0.5">
                       Session risk triggered an automated TOTP Challenge. Enter code from your authenticator app to authorize access.
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowChallengeModal(true)}
-                  className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-mono font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-lg shadow-amber-950/50 cursor-pointer whitespace-nowrap"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-mono font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm shadow-amber-200 cursor-pointer whitespace-nowrap"
                 >
                   <KeyRound className="w-3.5 h-3.5" /> Enter 6-Digit Code
                 </button>
@@ -610,13 +611,13 @@ export default function DashboardPage() {
 
         {/* Chronological Login History (Phase 4 Real Data) */}
         {loginHistoryList.length > 0 && (
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <h3 className="text-sm font-mono font-bold text-slate-200 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-cyan-400" /> Real Login Geolocation Audit Trail (PostgreSQL)
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <h3 className="text-sm font-mono font-bold text-slate-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-indigo-600" /> Real Login Geolocation Audit Trail (PostgreSQL)
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs font-mono text-left">
-                <thead className="text-slate-400 border-b border-slate-800 bg-slate-950/50">
+                <thead className="text-slate-600 border-b border-slate-200 bg-slate-50 font-bold">
                   <tr>
                     <th className="py-2.5 px-3">Session Log ID</th>
                     <th className="py-2.5 px-3">IP Address</th>
@@ -625,22 +626,22 @@ export default function DashboardPage() {
                     <th className="py-2.5 px-3">Timestamp (UTC)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {loginHistoryList.slice(0, 5).map((log) => (
-                    <tr key={log.id} className="hover:bg-slate-800/30 transition-colors">
-                      <td className="py-2.5 px-3 text-cyan-400">{log.id}</td>
-                      <td className="py-2.5 px-3 text-slate-200 font-bold">{log.ip_address}</td>
+                    <tr key={log.id} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-2.5 px-3 text-indigo-700 font-bold">{log.id}</td>
+                      <td className="py-2.5 px-3 text-slate-900 font-bold">{log.ip_address}</td>
                       <td className="py-2.5 px-3">
                         {log.geo_city}, {log.geo_country}
                       </td>
                       <td className="py-2.5 px-3">
                         {log.is_vpn_or_proxy ? (
-                          <span className="text-rose-400 font-semibold">Flagged</span>
+                          <span className="text-rose-700 font-semibold">Flagged</span>
                         ) : (
-                          <span className="text-emerald-400">Direct</span>
+                          <span className="text-emerald-700 font-semibold">Direct</span>
                         )}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-400">
+                      <td className="py-2.5 px-3 text-slate-500">
                         {new Date(log.created_at).toLocaleString()}
                       </td>
                     </tr>
@@ -654,30 +655,30 @@ export default function DashboardPage() {
 
       {/* PHASE 3 STEP-UP CHALLENGE MODAL */}
       {showChallengeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-slate-900 border border-amber-800/80 rounded-2xl p-6 shadow-2xl shadow-amber-950/40 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white border border-amber-200 rounded-2xl p-6 shadow-2xl relative">
             <div className="text-center mb-6">
-              <div className="inline-flex p-3 rounded-2xl bg-amber-950/80 border border-amber-700/60 mb-3 shadow-inner">
-                <KeyRound className="w-7 h-7 text-amber-400" />
+              <div className="inline-flex p-3 rounded-2xl bg-amber-50 border border-amber-200 mb-3 shadow-xs">
+                <KeyRound className="w-7 h-7 text-amber-600" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight text-slate-100">
+              <h3 className="text-xl font-bold tracking-tight text-slate-900">
                 Additional Verification Required
               </h3>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 ContextGuard Step-Up Authentication Challenge
               </p>
             </div>
 
             {challengeError && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-950/70 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>{challengeError}</span>
               </div>
             )}
 
             <form onSubmit={handleVerifyChallenge} className="space-y-5">
               <div>
-                <label className="block text-xs font-mono font-medium text-slate-300 mb-2 text-center">
+                <label className="block text-xs font-mono font-medium text-slate-700 mb-2 text-center">
                   Enter 6-Digit Code from your Authenticator App
                 </label>
                 <input
@@ -688,7 +689,7 @@ export default function DashboardPage() {
                   value={totpCode}
                   onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                   placeholder="000000"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3.5 text-center text-2xl tracking-[0.5em] font-mono font-bold text-amber-300 placeholder-slate-700 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 text-center text-2xl tracking-[0.5em] font-mono font-bold text-amber-900 placeholder-slate-300 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all shadow-xs"
                 />
               </div>
 
@@ -696,14 +697,14 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowChallengeModal(false)}
-                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono font-bold py-3 rounded-xl transition-colors cursor-pointer"
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-mono font-bold py-3 rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={verifyingChallenge || totpCode.length !== 6}
-                  className="flex-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-mono font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-amber-950/50 transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-mono font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-sm shadow-amber-200 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {verifyingChallenge ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />

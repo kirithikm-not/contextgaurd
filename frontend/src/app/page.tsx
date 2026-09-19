@@ -197,21 +197,21 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
       {/* Scenario Demo Sub-Header & Live Mode Call-to-Action Banner */}
-      <section className="border-b border-slate-800/80 bg-gradient-to-r from-slate-950 via-slate-900/90 to-cyan-950/20 px-6 py-4">
+      <section className="border-b border-slate-200/80 bg-gradient-to-r from-indigo-50/70 via-white to-sky-50/70 px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/60 uppercase">
+              <span className="text-[11px] font-mono font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">
                 Scenario Replay &amp; Signal Simulator
               </span>
               <span className="text-xs text-slate-500 font-mono">• Interactive Demo Playground</span>
             </div>
-            <h1 className="text-lg font-bold text-white tracking-tight">
+            <h1 className="text-lg font-bold text-slate-900 tracking-tight">
               Continuous Zero-Trust Evaluation Engine
             </h1>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600">
               Deterministic Core with Agentic Reasoning Override • Instant Signal Knob Tuning
             </p>
           </div>
@@ -220,7 +220,7 @@ export default function Home() {
             {/* Prominent Call to Action */}
             <Link
               href="/login"
-              className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/35 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-600 hover:to-sky-600 text-white shadow-sm shadow-indigo-200 hover:shadow-indigo-300 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Try Live Mode with Real Account</span>
               <ArrowRight className="w-4 h-4" />
@@ -228,22 +228,22 @@ export default function Home() {
 
             {/* Live Telemetry Stream Status */}
             <div className="flex items-center gap-2 text-xs font-mono">
-              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-800 bg-slate-900/80">
-                <Radio className={`w-3.5 h-3.5 ${wsConnected ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
-                <span className="text-slate-400">Stream:</span>
-                <span className={wsConnected ? 'text-emerald-400 font-bold' : 'text-slate-500'}>
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white shadow-xs">
+                <Radio className={`w-3.5 h-3.5 ${wsConnected ? 'text-emerald-600 animate-pulse' : 'text-slate-400'}`} />
+                <span className="text-slate-500">Stream:</span>
+                <span className={wsConnected ? 'text-emerald-700 font-bold' : 'text-slate-400'}>
                   {wsConnected ? 'LIVE' : 'DISCONNECTED'}
                 </span>
               </div>
 
-              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-800 bg-slate-900/80">
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white shadow-xs">
                 {backendHealth ? (
-                  <span className="text-emerald-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> API :8000
+                  <span className="text-emerald-700 font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> API :8000
                   </span>
                 ) : (
-                  <span className="text-rose-400 font-bold flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> Offline
+                  <span className="text-rose-700 font-bold flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-600" /> Offline
                   </span>
                 )}
               </div>
@@ -253,7 +253,7 @@ export default function Home() {
       </section>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-slate-800 bg-slate-900/30 px-6 backdrop-blur">
+      <div className="border-b border-slate-200 bg-white/80 px-6 backdrop-blur shadow-xs">
         <div className="max-w-7xl mx-auto flex overflow-x-auto gap-2 py-2.5">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -264,11 +264,11 @@ export default function Home() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-md shadow-cyan-950/50'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent'
+                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
                 {tab.label}
               </button>
             );
