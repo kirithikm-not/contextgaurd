@@ -21,13 +21,27 @@ export default function MfaSetupPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    let currentUser: any = null;
     const rawUser = localStorage.getItem('contextguard_user');
-    if (!rawUser) {
-      router.push('/login');
-      return;
+    if (rawUser) {
+      try {
+        currentUser = JSON.parse(rawUser);
+      } catch (e) {
+        currentUser = null;
+      }
     }
-    const parsedUser = JSON.parse(rawUser);
-    setUser(parsedUser);
+
+    if (!currentUser) {
+      // Fallback demo user for immediate mobile QR testing
+      currentUser = {
+        id: 'usr_totp_test',
+        email: 'analyst@contextguard.local',
+        mfa_enabled: false,
+      };
+      localStorage.setItem('contextguard_user', JSON.stringify(currentUser));
+    }
+
+    setUser(currentUser);
 
     // Call /api/auth/mfa/setup
     const fetchMfaSetup = async () => {
@@ -35,7 +49,7 @@ export default function MfaSetupPage() {
         const res = await fetch(`${API_BASE_URL}/api/auth/mfa/setup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: parsedUser.id }),
+          body: JSON.stringify({ user_id: currentUser.id }),
         });
         const data = await res.json();
         if (res.ok) {

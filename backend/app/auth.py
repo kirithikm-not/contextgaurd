@@ -302,9 +302,12 @@ def mfa_setup(payload: MfaSetupRequest, db: Session = Depends(get_db)):
             detail="User not found."
         )
 
-    totp_secret = pyotp.random_base32()
-    user.totp_secret = totp_secret
-    db.commit()
+    # If user already has a secret, reuse it so component re-mounts / page reloads don't invalidate the scanned QR code
+    totp_secret = user.totp_secret
+    if not totp_secret:
+        totp_secret = pyotp.random_base32()
+        user.totp_secret = totp_secret
+        db.commit()
 
     provisioning_uri = pyotp.totp.TOTP(totp_secret).provisioning_uri(
         name=user.email,
@@ -357,7 +360,8 @@ def mfa_enable(payload: MfaEnableRequest, db: Session = Depends(get_db)):
         )
 
     totp = pyotp.TOTP(user.totp_secret)
-    if not totp.verify(payload.totp_code.strip(), valid_window=1):
+    # Use valid_window=2 (allows current window ± 2 windows = 2.5 minutes tolerance for drift)
+    if not totp.verify(payload.totp_code.strip(), valid_window=2):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid TOTP code."

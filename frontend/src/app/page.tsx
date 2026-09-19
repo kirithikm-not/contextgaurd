@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { 
   AccessEvaluationResult, 
   DemoScenario 
@@ -213,6 +214,20 @@ export default function Home() {
             </div>
             <p className="text-[11px] text-slate-400">Context Beats Role • Deterministic Core, Agentic Edge</p>
           </div>
+        </div>
+
+        {/* Global Demo vs Live Mode Switcher */}
+        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+          <span className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm flex items-center gap-1.5">
+            <Sliders className="w-3.5 h-3.5 text-cyan-400" /> Scenario Demo Mode
+          </span>
+          <Link
+            href="/dashboard"
+            className="px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-900 flex items-center gap-1.5 transition-all"
+            title="Switch to Real User Sign-In, TOTP MFA & Geolocation"
+          >
+            <Radio className="w-3.5 h-3.5 text-slate-500" /> Live Mode (MFA &amp; Location)
+          </Link>
         </div>
 
         {/* Live Status Indicators */}

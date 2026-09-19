@@ -79,6 +79,7 @@ ws_manager = ConnectionManager()
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint for container orchestrators and frontend ping."""
+    import os
     return {
         "status": "healthy",
         "service": "ContextGuard Access Intelligence Engine",
@@ -86,6 +87,7 @@ async def health_check():
         "mock_agent_mode": settings.USE_MOCK_AGENT,
         "anthropic_model": settings.ANTHROPIC_MODEL,
         "environment": settings.ENVIRONMENT,
+        "pid": os.getpid(),
     }
 
 
@@ -269,3 +271,5 @@ async def websocket_decisions_endpoint(websocket: WebSocket):
             await websocket.send_json({"type": "PONG", "message": "ContextGuard stream active"})
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
+
+# reload trigger
