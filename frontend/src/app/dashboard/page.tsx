@@ -268,8 +268,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-black">
-      {/* Top Navigation Header */}
-      <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      {/* Dashboard Sub-Header */}
+      <div className="border-b border-slate-800/80 bg-slate-900/40 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link href="/" className="p-2 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:opacity-90 transition-opacity">
             <Shield className="w-5 h-5" />
@@ -314,7 +314,7 @@ export default function DashboardPage() {
             <KeyRound className="w-3.5 h-3.5 text-amber-400" /> Re-enroll MFA
           </Link>
         </div>
-      </header>
+      </div>
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">

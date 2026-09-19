@@ -24,7 +24,8 @@ import {
   CheckCircle2, 
   AlertCircle,
   Sparkles,
-  Bot
+  Bot,
+  ArrowRight
 } from 'lucide-react';
 
 export default function Home() {
@@ -197,64 +198,59 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-black">
-      {/* Top Header */}
-      <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20">
-            <Shield className="w-6 h-6" />
-          </div>
+      {/* Scenario Demo Sub-Header & Live Mode Call-to-Action Banner */}
+      <section className="border-b border-slate-800/80 bg-gradient-to-r from-slate-950 via-slate-900/90 to-cyan-950/20 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                ContextGuard
-              </h1>
-              <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60">
-                Zero-Trust Access Intelligence
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[11px] font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/60 uppercase">
+                Scenario Replay &amp; Signal Simulator
               </span>
+              <span className="text-xs text-slate-500 font-mono">• Interactive Demo Playground</span>
             </div>
-            <p className="text-[11px] text-slate-400">Context Beats Role • Deterministic Core, Agentic Edge</p>
-          </div>
-        </div>
-
-        {/* Global Demo vs Live Mode Switcher */}
-        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
-          <span className="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm flex items-center gap-1.5">
-            <Sliders className="w-3.5 h-3.5 text-cyan-400" /> Scenario Demo Mode
-          </span>
-          <Link
-            href="/dashboard"
-            className="px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-900 flex items-center gap-1.5 transition-all"
-            title="Switch to Real User Sign-In, TOTP MFA & Geolocation"
-          >
-            <Radio className="w-3.5 h-3.5 text-slate-500" /> Live Mode (MFA &amp; Location)
-          </Link>
-        </div>
-
-        {/* Live Status Indicators */}
-        <div className="flex items-center gap-3 text-xs font-mono">
-          {/* WebSocket Status */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-800 bg-slate-900/80">
-            <Radio className={`w-3.5 h-3.5 ${wsConnected ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
-            <span className="text-slate-400">Stream:</span>
-            <span className={wsConnected ? 'text-emerald-400 font-bold' : 'text-slate-500'}>
-              {wsConnected ? 'LIVE' : 'DISCONNECTED'}
-            </span>
+            <h1 className="text-lg font-bold text-white tracking-tight">
+              Continuous Zero-Trust Evaluation Engine
+            </h1>
+            <p className="text-xs text-slate-400">
+              Deterministic Core with Agentic Reasoning Override • Instant Signal Knob Tuning
+            </p>
           </div>
 
-          {/* Backend Status */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-800 bg-slate-900/80">
-            {backendHealth ? (
-              <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> API :8000
-              </span>
-            ) : (
-              <span className="text-rose-400 font-bold flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" /> Offline
-              </span>
-            )}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Prominent Call to Action */}
+            <Link
+              href="/login"
+              className="px-4 py-2 rounded-xl text-xs font-mono font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/35 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span>Try Live Mode with Real Account</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            {/* Live Telemetry Stream Status */}
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-800 bg-slate-900/80">
+                <Radio className={`w-3.5 h-3.5 ${wsConnected ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
+                <span className="text-slate-400">Stream:</span>
+                <span className={wsConnected ? 'text-emerald-400 font-bold' : 'text-slate-500'}>
+                  {wsConnected ? 'LIVE' : 'DISCONNECTED'}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-800 bg-slate-900/80">
+                {backendHealth ? (
+                  <span className="text-emerald-400 font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> API :8000
+                  </span>
+                ) : (
+                  <span className="text-rose-400 font-bold flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" /> Offline
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </section>
 
       {/* Navigation Tabs */}
       <div className="border-b border-slate-800 bg-slate-900/30 px-6 backdrop-blur">
